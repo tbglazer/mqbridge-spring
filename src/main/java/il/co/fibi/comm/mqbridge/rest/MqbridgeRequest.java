@@ -1,0 +1,69 @@
+package il.co.fibi.comm.mqbridge.rest;
+
+import org.json.JSONObject;
+import org.json.XML;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import il.co.fibi.comm.mqbridge.cache.Cache;
+import il.co.fibi.comm.mqbridge.cache.CacheType;
+import il.co.fibi.comm.mqbridge.cache.ICache;
+import il.co.fibi.comm.mqbridge.data.MainframeConvertor;
+import il.co.fibi.comm.mqbridge.service.ServiceRequest;
+
+public class MqbridgeRequest {
+	@Autowired MainframeConvertor convertor;
+	@Autowired @Cache(CacheType.CBXML) ICache cbxml;
+
+	private String trxid; // transaction id
+	private String body; // request body
+	private String key; // message key
+
+	public String getTrxid() {
+		return trxid;
+	}
+
+	public void setTrxid(String trxid) {
+		this.trxid = trxid;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+	
+	public MqbridgeRequest setup(String trxid, String body, String key) {
+		setTrxid(trxid);
+		setBody(body);
+		setKey(key);
+		return this;
+	}
+	
+	public ServiceRequest toServiceRequest() {
+		String data = body != null ? convertor.xml2data(xmlFromJsonBody(trxid, body), (String)cbxml.get(trxid)) : null;
+		return new ServiceRequest(trxid, data, key);
+	}
+
+	private String xmlFromJsonBody(String trxid, String body) {
+		StringBuffer sb = new StringBuffer();
+		return sb.append("<copybook><")
+		  .append(trxid)
+		  .append(">")
+		  .append(XML.toString(new JSONObject(body)))
+		  .append("</")
+		  .append(trxid)
+		  .append("></copybook>")
+		  .toString();
+	}
+	
+}

@@ -1,0 +1,154 @@
+package il.co.fibi.comm.mqbridge.service;
+
+import java.util.logging.Logger;
+
+import javax.jms.Queue;
+import javax.jms.QueueConnectionFactory;
+
+import il.co.fibi.comm.mqbridge.cache.ProtoParams;
+import il.co.fibi.comm.mqbridge.constants.ibm.MQConstants;
+import il.co.fibi.comm.mqbridge.headers.MQCIH;
+
+public abstract class MqbridgeService {
+
+	static protected final byte[] AID = { 0x7d, ' ', ' ', ' ' };
+	static protected final String RCV_VECTOR = "0402";
+	static protected final String INBOUND = "I ";
+	static protected final String VERSION = "0000";
+	static protected final String YES = "Y ";
+	static protected final String NO = "N ";
+	static protected final String CSQCBDCI = "CSQCBDCI";
+	static protected final String CHARSET = "424";
+	static protected final String LATIN_1 = "8859_1";
+	static protected final String FMH = "\306\324\310"; // FMH
+	static protected final int PROGNAME_LEN = 8;
+	static protected final int ENCODING = 785;
+
+	protected QueueConnectionFactory queueConnFactory;
+	protected Queue requestQueue;
+	protected Queue replyQueue;
+	protected int timeout;
+	protected int priority;
+	
+	public MqbridgeService init(ProtoParams params) {
+		setTimeout(params.getTimeout() * 1000);
+		return this;
+	}
+	public abstract ServiceResponse send(ServiceRequest request);
+
+	public abstract ServiceResponse receive(ServiceRequest request);
+
+	public abstract Logger getLogger();
+	
+	public void setQueueConnFactory(QueueConnectionFactory queueConnFactory) {
+		this.queueConnFactory = queueConnFactory;
+	}
+
+	public void setRequestQueue(Queue requestQueue) {
+		this.requestQueue = requestQueue;
+	}
+
+	public void setReplyQueue(Queue replyQueue) {
+		this.replyQueue = replyQueue;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	/**
+	 * Analyze the CICS header for errors
+	 * 
+	 * @param cicsHeader
+	 * @throws DSECCException
+	 */
+	protected void checkCicsHeaderForErrors(MQCIH cicsHeader) throws MqbridgeException {
+		int returncode = cicsHeader.getMqcih__returncode();
+		switch (returncode) {
+		case MQConstants.MQCRC_OK: {
+			return;
+		}
+		case MQConstants.MQCRC_BRIDGE_ERROR: {
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException("Bridge error, reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_MQ_API_ERROR: {
+			String function = cicsHeader.getMqcih__function();
+			int compcode = cicsHeader.getMqcih__compcode();
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException(
+					"Api error, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_BRIDGE_TIMEOUT: {
+			String function = cicsHeader.getMqcih__function();
+			int compcode = cicsHeader.getMqcih__compcode();
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException(
+					"Bridge timeout, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_CICS_EXEC_ERROR: {
+			String function = cicsHeader.getMqcih__function();
+			int compcode = cicsHeader.getMqcih__compcode();
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException(
+					"Cics exec error, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_SECURITY_ERROR: {
+			String function = cicsHeader.getMqcih__function();
+			int compcode = cicsHeader.getMqcih__compcode();
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException(
+					"Security error, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_PROGRAM_NOT_AVAILABLE: {
+			String function = cicsHeader.getMqcih__function();
+			int compcode = cicsHeader.getMqcih__compcode();
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException(
+					"Program not available, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_TRANSID_NOT_AVAILABLE: {
+			String function = cicsHeader.getMqcih__function();
+			int compcode = cicsHeader.getMqcih__compcode();
+			int reason = cicsHeader.getMqcih__reason();
+			MqbridgeException e = new MqbridgeException(
+					"Transid not available, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_BRIDGE_ABEND: {
+			String abendcode = cicsHeader.getMqcih__abendcode();
+			MqbridgeException e = new MqbridgeException("Bridge abend, abendcode:" + abendcode);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		case MQConstants.MQCRC_APPLICATION_ABEND: {
+			String abendcode = cicsHeader.getMqcih__abendcode();
+			MqbridgeException e = new MqbridgeException("Application abend, abendcode:" + abendcode);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		default: {
+			MqbridgeException e = new MqbridgeException("Unknown return code, returncode:" + returncode);
+			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			throw e;
+		}
+		}
+	}
+}
