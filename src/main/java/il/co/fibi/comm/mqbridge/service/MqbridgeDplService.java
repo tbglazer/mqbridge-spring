@@ -1,17 +1,15 @@
 package il.co.fibi.comm.mqbridge.service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.QueueConnection;
-import javax.jms.QueueReceiver;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
 import javax.jms.Session;
 
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -27,7 +25,7 @@ import io.opentracing.util.GlobalTracer;
 
 @RequestScope
 @Component("DPL")
-public class MqbridgeDplService extends MqbridgeService {
+public class MqbridgeDplService extends AbstractMqbridgeService {
 	private final Logger log = Logger.getLogger(MqbridgeDplService.class.getName());
 	private String progname;
 	private String runasid;
@@ -56,7 +54,7 @@ public class MqbridgeDplService extends MqbridgeService {
 	}
 
 	@Override
-	public MqbridgeService init(ProtoParams params) {
+	public AbstractMqbridgeService init(ProtoParams params) {
 		super.init(params);
 		setProgname(params.getProgname());
 		setRunasid(params.getRunasid());
@@ -71,53 +69,54 @@ public class MqbridgeDplService extends MqbridgeService {
 				.withTag(ElasticApmTags.SUBTYPE, "dpl").start();
 		final ServiceResponse response = new ServiceResponse();
 		response.setStatus(-2);
-		try (QueueConnection queueConn = queueConnFactory.createQueueConnection();
-				QueueSession queueSess = queueConn.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-				QueueSender queueSender = queueSess.createSender(requestQueue);
-			) {
-			queueSender.setTimeToLive(timeout);
-			queueSender.setPriority(priority);
-			queueConn.start();
+		try {
+			final AtomicReference<BytesMessage> msg = new AtomicReference<>();
+			jmsTemplate.send(requestQueue, new MessageCreator() {
+				public Message createMessage(Session session) throws JMSException {
+					try {
+						BytesMessage bytesMsg = session.createBytesMessage();
+						bytesMsg.setJMSMessageID(new String(MQConstants.MQMI_NONE));
+						bytesMsg.setJMSCorrelationID(new String(MQConstants.MQCI_NEW_SESSION, LATIN_1));
+						bytesMsg.setJMSReplyTo(session.createQueue(replyQueue));
+						bytesMsg.setStringProperty(JmsConstants.JMS_IBM_FORMAT, MQConstants.MQFMT_CICS);
+						bytesMsg.setStringProperty(JmsConstants.JMS_IBM_CHARACTER_SET, CHARSET);
+						bytesMsg.setIntProperty(JmsConstants.JMS_IBM_ENCODING, ENCODING);
+						bytesMsg.setIntProperty(JmsConstants.JMS_IBM_MSGTYPE, MQConstants.MQMT_REQUEST);
+						bytesMsg.setIntProperty(JmsConstants.JMS_IBM_REPORT_EXPIRATION,
+								MQConstants.MQRO_EXPIRATION_WITH_DATA);
 
-			BytesMessage bytesMsg = queueSess.createBytesMessage();
-			bytesMsg.setJMSMessageID(new String(MQConstants.MQMI_NONE));
-			bytesMsg.setJMSCorrelationID(new String(MQConstants.MQCI_NEW_SESSION, LATIN_1));
-			bytesMsg.setJMSReplyTo(replyQueue);
-			bytesMsg.setStringProperty(JmsConstants.JMS_IBM_FORMAT, MQConstants.MQFMT_CICS);
-			bytesMsg.setStringProperty(JmsConstants.JMS_IBM_CHARACTER_SET, CHARSET);
-			bytesMsg.setIntProperty(JmsConstants.JMS_IBM_ENCODING, ENCODING);
-			bytesMsg.setIntProperty(JmsConstants.JMS_IBM_MSGTYPE, MQConstants.MQMT_REQUEST);
-			bytesMsg.setIntProperty(JmsConstants.JMS_IBM_REPORT_EXPIRATION, MQConstants.MQRO_EXPIRATION_WITH_DATA);
+						MQCIH cicsHeader = new MQCIH();
+						cicsHeader.setMqcih__strucid(MQConstants.MQCIH_STRUC_ID);
+						cicsHeader.setMqcih__struclength(MQConstants.MQCIH_LENGTH_2);
+						cicsHeader.setMqcih__uowcontrol(MQConstants.MQCUOWC_ONLY);
+						cicsHeader.setMqcih__version(MQConstants.MQCIH_VERSION_2);
+						cicsHeader.setMqcih__facility(new String(MQConstants.MQCFAC_NONE, LATIN_1));
+						cicsHeader.setMqcih__facilitykeeptime(0);
+						cicsHeader.setMqcih__format(MQConstants.MQFMT_NONE);
+						cicsHeader.setMqcih__linktype(MQConstants.MQCLT_PROGRAM);
+						cicsHeader.setMqcih__transactionid(runasid);
+						cicsHeader.setMqcih__flags(MQConstants.MQCIH_PASS_EXPIRATION);
 
-			MQCIH cicsHeader = new MQCIH();
-			cicsHeader.setMqcih__strucid(MQConstants.MQCIH_STRUC_ID);
-			cicsHeader.setMqcih__struclength(MQConstants.MQCIH_LENGTH_2);
-			cicsHeader.setMqcih__uowcontrol(MQConstants.MQCUOWC_ONLY);
-			cicsHeader.setMqcih__version(MQConstants.MQCIH_VERSION_2);
-			cicsHeader.setMqcih__facility(new String(MQConstants.MQCFAC_NONE, LATIN_1));
-			cicsHeader.setMqcih__facilitykeeptime(0);
-			cicsHeader.setMqcih__format(MQConstants.MQFMT_NONE);
-			cicsHeader.setMqcih__linktype(MQConstants.MQCLT_PROGRAM);
-			cicsHeader.setMqcih__transactionid(runasid);
-			cicsHeader.setMqcih__flags(MQConstants.MQCIH_PASS_EXPIRATION);
-
-			bytesMsg.writeBytes(cicsHeader.getBytes());
-			byte bProgName[] = new byte[PROGNAME_LEN];
-			MarshallStringUtils.marshallFixedLengthStringIntoBuffer(progname, bProgName, 0, CHARSET, PROGNAME_LEN,
-					MarshallStringUtils.STRING_JUSTIFICATION_LEFT, " ");
-			bytesMsg.writeBytes(bProgName);
-			bytesMsg.writeBytes(request.getData().getBytes(LATIN_1));
-			byte[] bPadBytes = getPadBytes(request.getData());
-			MarshallStringUtils.marshallFixedLengthStringIntoBuffer("", bPadBytes, 0, CHARSET, bPadBytes.length,
-					MarshallStringUtils.STRING_JUSTIFICATION_LEFT, " ");
-			bytesMsg.writeBytes(bPadBytes);
-			queueSender.send(bytesMsg);
-			response.setKey(bytesMsg.getJMSMessageID());
+						bytesMsg.writeBytes(cicsHeader.getBytes());
+						byte bProgName[] = new byte[PROGNAME_LEN];
+						MarshallStringUtils.marshallFixedLengthStringIntoBuffer(progname, bProgName, 0, CHARSET,
+								PROGNAME_LEN, MarshallStringUtils.STRING_JUSTIFICATION_LEFT, " ");
+						bytesMsg.writeBytes(bProgName);
+						bytesMsg.writeBytes(request.getData().getBytes(LATIN_1));
+						byte[] bPadBytes = getPadBytes(request.getData());
+						MarshallStringUtils.marshallFixedLengthStringIntoBuffer("", bPadBytes, 0, CHARSET,
+								bPadBytes.length, MarshallStringUtils.STRING_JUSTIFICATION_LEFT, " ");
+						bytesMsg.writeBytes(bPadBytes);
+						msg.set(bytesMsg);
+						return bytesMsg;
+					} catch (Exception e) {
+						throw new JMSException(e.getMessage());
+					}
+				}
+			});
+			response.setKey(msg.get().getJMSMessageID());
 			response.setStatus(0);
 			span.setTag(ElasticApmTags.RESULT, "success");
-		} catch (UnsupportedEncodingException e) {
-			span.setTag(ElasticApmTags.RESULT, "failure");
-			log.severe("send failed:" + e.getMessage());
 		} catch (JMSException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
 			Exception le = e.getLinkedException();
@@ -134,13 +133,11 @@ public class MqbridgeDplService extends MqbridgeService {
 				.withTag(ElasticApmTags.SUBTYPE, "dpl").start();
 		final ServiceResponse response = new ServiceResponse();
 		response.setStatus(-2);
-		try (QueueConnection queueConn = queueConnFactory.createQueueConnection();
-				QueueSession queueSess = queueConn.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-				QueueReceiver queueReceiver = queueSess.createReceiver(replyQueue,
-						JmsConstants.JMS_CORRELATIONID + "='" + request.getKey().split(";")[0] + "'");) {
-			queueConn.start();
+		try {
 			do {
-				Message msg = queueReceiver.receive(timeout);
+				jmsTemplate.setReceiveTimeout(timeout);
+				final Message msg = jmsTemplate.receiveSelected(replyQueue,
+						JmsConstants.JMS_CORRELATIONID + "='" + request.getKey().split(";")[0] + "'");
 				if (msg instanceof BytesMessage) {
 					BytesMessage bytesMsg = (BytesMessage) msg;
 					if (((bytesMsg.getIntProperty(JmsConstants.JMS_IBM_MSGTYPE)) == MQConstants.MQMT_REPLY)

@@ -3,20 +3,20 @@ package il.co.fibi.comm.mqbridge.data;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Document;
 
 import co.elastic.apm.opentracing.ElasticApmTags;
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import net.sf.cb2xml.convert.MainframeToXml;
 import net.sf.cb2xml.convert.XmlToMainframe;
 import net.sf.cb2xml.util.XmlUtils;
 
-@RequestScoped
+@RequestScope
 public class MainframeConvertor {
-	@Inject
+	@Autowired
 	MainframeDecorator decorator;
 
 	public String xml2data(String input, String copybook) {

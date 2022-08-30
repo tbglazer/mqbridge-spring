@@ -1,18 +1,21 @@
 package il.co.fibi.comm.mqbridge.cache;
 
-import java.io.StringReader;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
-import jakarta.xml.bind.annotation.XmlEnum;
-import jakarta.xml.bind.annotation.XmlEnumValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
-@RequestScoped
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import il.co.fibi.comm.mqbridge.mongo.ProtolItem;
+
+@Component
+@RequestScope
 public class ProtoParams {
-	@Inject
+	@Autowired
 	@Cache(CacheType.PROTO)
 	ICache proto;
 
@@ -61,17 +64,20 @@ public class ProtoParams {
 	}
 
 	public ProtoParams build(String trxid) {
-		String s = (String) proto.get(trxid);
-		if (s != null) {
-			JsonReader reader = Json.createReader(new StringReader(s));
-			JsonObject o = reader.readObject();
-			protocol = PROTOCOL.valueOf(o.getString("protocol"));
-			cicsid = o.getString("cicsid", "");
-			timeout = o.getInt("timeout", 10);
-			progname = o.getString("progname", "");
-			runasid = o.getString("runasid", "");
-			carealen = o.getInt("carealen", -1);
-			respofst = o.getInt("respofst", -1);
+		ProtolItem item = (ProtolItem) proto.get(trxid);
+		if (item != null) {
+			JsonNode o = null;
+			try {
+				o = new ObjectMapper().readTree(item.getVal());
+			} catch (Exception e) {
+			}
+			protocol = PROTOCOL.valueOf(o.get("protocol").asText());
+			cicsid = o.get("cicsid") != null ? o.get("cicsid").asText() : "";
+			timeout = o.get("timeout") != null ? o.get("timeout").asInt() : 10;
+			progname = o.get("progname") != null ? o.get("progname").asText() : "";
+			runasid = o.get("runasid") != null ? o.get("runasid").asText() : "";
+			carealen = o.get("carealen") != null ? o.get("carealen").asInt() : -1;
+			respofst = o.get("respofst") != null ? o.get("respofst").asInt() : -1;
 		} else {
 			protocol = PROTOCOL.L3270;
 			cicsid = "";

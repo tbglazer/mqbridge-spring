@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ TYPE, FIELD, METHOD })
-
 public @interface Cache {
 	CacheType value();
 }

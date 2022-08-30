@@ -7,18 +7,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 
-@RequestScoped
-@Named("TIM")
+@RequestScope
+@Component("TIM")
 public class TimeDecorator implements IDecorator {
 	private int length;
+
 	private enum TimeParam implements DecoratorUtils.IGetName {
 		SOURCE_FORMAT("SF", "HHmm"), TARGET_FORMAT("TF", "HHmm");
 

@@ -6,21 +6,24 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 import net.sf.cb2xml.def.Cb2xmlConstants.SignClause;
 
-@RequestScoped
-@Named("DEC")
+@RequestScope
+@Component("DEC")
 public class DecimalDecorator implements IDecorator {
 	private int length, scale;
 	private SignClause sign;
+
 	private enum DecimalParam implements DecoratorUtils.IGetName {
 		SHOW_ZERO("SHZ"), SHOW_POSITIVE_SIGN("SPS"), ADD_POSITIVE_SIGN("APS");
+
 		private final String name;
+
 		private DecimalParam(String name) {
 			this.name = name;
 		}
@@ -29,12 +32,13 @@ public class DecimalDecorator implements IDecorator {
 		public String getName() {
 			return this.name;
 		}
-		
+
 		public static Optional<DecimalParam> toDecimalParam(String name) {
 			return Arrays.asList(DecimalParam.values()).stream().filter(p -> p.getName().equals(name)).findFirst();
 		}
-		
+
 	};
+
 	List<DecimalParam> params;
 
 	@Override
@@ -43,7 +47,6 @@ public class DecimalDecorator implements IDecorator {
 		return StringUtils.leftPad(input, length, '0');
 	}
 
-	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);
@@ -61,8 +64,7 @@ public class DecimalDecorator implements IDecorator {
 					input = StringUtils.overlay(input, "-", 0, 0);
 				}
 				input = StringUtils.stripEnd(input, ".");
-			}
-			else {
+			} else {
 				input = "";
 			}
 		}
@@ -78,7 +80,8 @@ public class DecimalDecorator implements IDecorator {
 		if (param != null) {
 			Arrays.asList(StringUtils.split(param, PARAM_SEPARATOR)).stream().forEach(p -> {
 				Optional<DecimalParam> dp = DecimalParam.toDecimalParam(p.toUpperCase());
-				if (dp.isPresent()) params.add(dp.get());
+				if (dp.isPresent())
+					params.add(dp.get());
 			});
 		}
 	}

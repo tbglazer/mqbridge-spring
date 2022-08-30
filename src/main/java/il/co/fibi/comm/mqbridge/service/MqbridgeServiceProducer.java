@@ -1,29 +1,39 @@
 package il.co.fibi.comm.mqbridge.service;
 
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlEnumValue;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
+
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
 import il.co.fibi.comm.mqbridge.cache.ProtoParams.PROTOCOL;
 import il.co.fibi.comm.mqbridge.jms.JmsConfiguration;
 
-@Singleton()
 public class MqbridgeServiceProducer {
-	@Inject	ProtoParams proto;	
-	@Inject JmsConfiguration config;
-	@Inject Instance<MqbridgeService> services;
-	
-	@Produces @RequestScoped 
-	public @ProducedService MqbridgeService select() {
+	@Autowired
+	JmsConfiguration config;
+	@Autowired
+	ProtoParams proto;
+	@Autowired
+	List<AbstractMqbridgeService> services;
+
+	@Bean
+	@RequestScope
+	public @ProducedService AbstractMqbridgeService select() {
 		try {
 			String name = PROTOCOL.class.getField(proto.getProtocol().name()).getAnnotation(XmlEnumValue.class).value();
-			Instance<MqbridgeService> service = services.select(NamedLiteral.of(name));
-			if (service.isResolvable()) {
-				MqbridgeService srv = service.get().init(proto);
-				srv.setQueueConnFactory(config.getQueue(name, proto.getCicsid()).factory);
+			List<AbstractMqbridgeService> srvs = services.stream().filter(service -> service.getClass().getAnnotation(Component.class).value() == name).toList();
+			if (!srvs.isEmpty()) {
+				AbstractMqbridgeService srv = srvs.get(0).init(proto);
 				srv.setRequestQueue(config.getQueue(name, proto.getCicsid()).sender);
 				srv.setReplyQueue(config.getQueue(name, proto.getCicsid()).receiver);
-				return service.get();
+				return srv;
 			}
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;

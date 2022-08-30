@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 
-@RequestScoped
-@Named("DAT")
+@RequestScope
+@Component("DAT")
 public class DateDecorator implements IDecorator {
 	private int length;
 

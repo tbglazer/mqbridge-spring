@@ -4,24 +4,24 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.Bidi;
 import com.ibm.icu.text.BidiTransform;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 import net.sf.cb2xml.def.Cb2xmlConstants.Justified;
 
-@RequestScoped
-@Named("HEB")
+@RequestScope
+@Component("HEB")
 public class HebrewDecorator implements IDecorator {
 	private int length;
 	private Justified justified;
 	private String charset;
-	
+
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);
@@ -29,8 +29,8 @@ public class HebrewDecorator implements IDecorator {
 		if (justified == Justified.RIGHT) {
 			input = StringUtils.reverseDelimited(input, CharUtils.LF);
 		}
-        return StringUtils.join(Arrays.asList(StringUtils.split(input, CharUtils.LF)).stream().map(line -> 
-        	convertToHebrew(line, true, charset)).toArray(String[]::new));
+		return StringUtils.join(Arrays.asList(StringUtils.split(input, CharUtils.LF)).stream()
+				.map(line -> convertToHebrew(line, true, charset)).toArray(String[]::new));
 	}
 
 	@Override
@@ -39,8 +39,11 @@ public class HebrewDecorator implements IDecorator {
 		if (justified == Justified.RIGHT) {
 			input = StringUtils.reverseDelimited(input, CharUtils.LF);
 		}
-        return StringUtils.leftPad(StringUtils.join(Arrays.asList(StringUtils.split(input, CharUtils.LF)).stream().map(line -> 
-        	convertFromHebrew(line, true, charset)).toArray(String[]::new)), length, ' ');
+		return StringUtils
+				.leftPad(
+						StringUtils.join(Arrays.asList(StringUtils.split(input, CharUtils.LF)).stream()
+								.map(line -> convertFromHebrew(line, true, charset)).toArray(String[]::new)),
+						length, ' ');
 	}
 
 	@Override
@@ -52,19 +55,23 @@ public class HebrewDecorator implements IDecorator {
 
 	private static String convertToHebrew(String input, boolean reverse, String charset) {
 		if (charset == CharsetDecorator.OLDCODE) {
-			input = StringUtils.replaceChars(input,	"&abcdefghijklmnopqrstuvwxyz~", "אבגדהוזטחיכךלמםנןסעפפצץקרשת ");
+			input = StringUtils.replaceChars(input, "&abcdefghijklmnopqrstuvwxyz~", "אבגדהוזטחיכךלמםנןסעפפצץקרשת ");
 		}
 		if (reverse && Bidi.requiresBidi(input.toCharArray(), 0, input.length())) {
-			input = new com.ibm.icu.text.BidiTransform().transform(input, Bidi.LTR, BidiTransform.Order.VISUAL, Bidi.RTL, BidiTransform.Order.LOGICAL, BidiTransform.Mirroring.ON, ArabicShaping.DIGITS_NOOP | ArabicShaping.LETTERS_NOOP);
+			input = new com.ibm.icu.text.BidiTransform().transform(input, Bidi.LTR, BidiTransform.Order.VISUAL,
+					Bidi.RTL, BidiTransform.Order.LOGICAL, BidiTransform.Mirroring.ON,
+					ArabicShaping.DIGITS_NOOP | ArabicShaping.LETTERS_NOOP);
 		}
 		return input;
 	}
 
 	private static String convertFromHebrew(String input, boolean reverse, String charset) {
 		if (reverse && Bidi.requiresBidi(input.toCharArray(), 0, input.length())) {
-			input = new com.ibm.icu.text.BidiTransform().transform(input, Bidi.RTL, BidiTransform.Order.LOGICAL, Bidi.LTR, BidiTransform.Order.VISUAL, BidiTransform.Mirroring.ON, ArabicShaping.DIGITS_NOOP | ArabicShaping.LETTERS_NOOP);
+			input = new com.ibm.icu.text.BidiTransform().transform(input, Bidi.RTL, BidiTransform.Order.LOGICAL,
+					Bidi.LTR, BidiTransform.Order.VISUAL, BidiTransform.Mirroring.ON,
+					ArabicShaping.DIGITS_NOOP | ArabicShaping.LETTERS_NOOP);
 			if (charset == CharsetDecorator.OLDCODE) {
-				input = StringUtils.replaceChars(input,	"אבגדהוזטחיכךלמםנןסעפפצץקרשת", "&abcdefghijklmnopqrstuvwxyz" );
+				input = StringUtils.replaceChars(input, "אבגדהוזטחיכךלמםנןסעפפצץקרשת", "&abcdefghijklmnopqrstuvwxyz");
 			}
 		}
 		return input;

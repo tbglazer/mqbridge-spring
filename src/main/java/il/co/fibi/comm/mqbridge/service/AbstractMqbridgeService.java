@@ -3,13 +3,15 @@ package il.co.fibi.comm.mqbridge.service;
 import java.util.logging.Logger;
 
 import javax.jms.Queue;
-import javax.jms.QueueConnectionFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
 import il.co.fibi.comm.mqbridge.constants.ibm.MQConstants;
 import il.co.fibi.comm.mqbridge.headers.MQCIH;
 
-public abstract class MqbridgeService {
+public abstract class AbstractMqbridgeService {
 
 	static protected final byte[] AID = { 0x7d, ' ', ' ', ' ' };
 	static protected final String RCV_VECTOR = "0402";
@@ -24,13 +26,15 @@ public abstract class MqbridgeService {
 	static protected final int PROGNAME_LEN = 8;
 	static protected final int ENCODING = 785;
 
-	protected QueueConnectionFactory queueConnFactory;
-	protected Queue requestQueue;
-	protected Queue replyQueue;
+	@Autowired
+	protected JmsTemplate jmsTemplate;
+
+	protected String requestQueue;
+	protected String replyQueue;
 	protected int timeout;
 	protected int priority;
 	
-	public MqbridgeService init(ProtoParams params) {
+	public AbstractMqbridgeService init(ProtoParams params) {
 		setTimeout(params.getTimeout() * 1000);
 		return this;
 	}
@@ -40,15 +44,11 @@ public abstract class MqbridgeService {
 
 	public abstract Logger getLogger();
 	
-	public void setQueueConnFactory(QueueConnectionFactory queueConnFactory) {
-		this.queueConnFactory = queueConnFactory;
-	}
-
-	public void setRequestQueue(Queue requestQueue) {
+	public void setRequestQueue(String requestQueue) {
 		this.requestQueue = requestQueue;
 	}
 
-	public void setReplyQueue(Queue replyQueue) {
+	public void setReplyQueue(String replyQueue) {
 		this.replyQueue = replyQueue;
 	}
 

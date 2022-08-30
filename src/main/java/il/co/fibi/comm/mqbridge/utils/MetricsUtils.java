@@ -1,8 +1,5 @@
 package il.co.fibi.comm.mqbridge.utils;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
 public class MetricsUtils {
 
 //    @Inject MetricRegistry registry;

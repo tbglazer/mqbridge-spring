@@ -2,15 +2,15 @@ package il.co.fibi.comm.mqbridge.data.decorators;
 
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 import net.sf.cb2xml.def.Cb2xmlConstants.Justified;
 
-@RequestScoped
-@Named("ENG")
+@RequestScope
+@Component("ENG")
 public class EnglishDecorator implements IDecorator {
 	private int length;
 	@SuppressWarnings("unused")
@@ -21,7 +21,8 @@ public class EnglishDecorator implements IDecorator {
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);
 		input = StringUtils.substringBefore(input, String.valueOf(CharUtils.NUL));
-		if (blankWhenZero && StringUtils.containsOnly(input, '0')) return ""; 
+		if (blankWhenZero && StringUtils.containsOnly(input, '0'))
+			return "";
 		return StringUtils.stripEnd(input, null);
 	}
 
