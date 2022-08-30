@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import com.ibm.icu.charset.CharsetICU;
@@ -15,6 +16,7 @@ import il.co.fibi.comm.mqbridge.cache.ICache;
 import il.co.fibi.comm.mqbridge.data.MainframeConvertor;
 import il.co.fibi.comm.mqbridge.service.ServiceResponse;
 
+@Component
 @RequestScope
 public class MqbridgeResponse {
 	@Autowired
@@ -48,7 +50,7 @@ public class MqbridgeResponse {
 			if (resp.getData() != null) {
 				String resid = new String(resp.getData().substring(0, 2).getBytes(StandardCharsets.ISO_8859_1),
 						CharsetICU.forName("Cp037"));
-				String data = convertor.data2xml(resp.getData(), (String) cbxml.get(trxid.concat("_").concat(resid)));
+				String data = convertor.data2xml(resp.getData(), cbxml.getValue(trxid.concat("_").concat(resid)));
 				res = XML.toJSONObject(data, true).getJSONObject("copybook")
 						.getJSONObject(trxid.concat("_").concat(resid));
 			} else {

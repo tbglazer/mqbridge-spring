@@ -23,8 +23,8 @@ import il.co.fibi.comm.mqbridge.headers.MQCIH;
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
 
+@Component
 @RequestScope
-@Component("DPL")
 public class MqbridgeDplService extends AbstractMqbridgeService {
 	private final Logger log = Logger.getLogger(MqbridgeDplService.class.getName());
 	private String progname;
@@ -48,6 +48,11 @@ public class MqbridgeDplService extends AbstractMqbridgeService {
 		this.respofst = respofst;
 	}
 
+	@Override
+	public String getId() {
+		return "DPL";
+	}
+	
 	@Override
 	public Logger getLogger() {
 		return log;
@@ -184,4 +189,5 @@ public class MqbridgeDplService extends AbstractMqbridgeService {
 	protected String extractData(String data) {
 		return data.substring(respofst - 1 + PROGNAME_LEN + FMH.length());
 	}
+
 }

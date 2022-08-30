@@ -3,10 +3,15 @@ package il.co.fibi.comm.mqbridge.service;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
+@Component
 @RequestScope
-@Component("CONT")
 public class MqbridgeContainerService extends MqbridgeDplService {
 
+	@Override
+	public String getId() {
+		return "CONT";
+	}
+	
 	@Override
 	protected byte[] getPadBytes(String param) {
 		return new byte[0];

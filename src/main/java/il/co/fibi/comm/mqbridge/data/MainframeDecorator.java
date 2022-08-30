@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
 import il.co.fibi.comm.mqbridge.data.decorators.IDecorator;
 
+@Component
 @RequestScope
 public class MainframeDecorator implements net.sf.cb2xml.convert.IDecorator {
 	@Autowired

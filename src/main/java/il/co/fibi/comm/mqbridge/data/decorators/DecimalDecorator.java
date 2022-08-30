@@ -13,8 +13,8 @@ import org.w3c.dom.Element;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 import net.sf.cb2xml.def.Cb2xmlConstants.SignClause;
 
+@Component
 @RequestScope
-@Component("DEC")
 public class DecimalDecorator implements IDecorator {
 	private int length, scale;
 	private SignClause sign;
@@ -42,11 +42,10 @@ public class DecimalDecorator implements IDecorator {
 	List<DecimalParam> params;
 
 	@Override
-	public String addDecoration(Element elem, String param, String input) {
-		getAttributes(elem, param);
-		return StringUtils.leftPad(input, length, '0');
+	public String getId() {
+		return "DEC";
 	}
-
+	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);
@@ -69,6 +68,12 @@ public class DecimalDecorator implements IDecorator {
 			}
 		}
 		return input;
+	}
+
+	@Override
+	public String addDecoration(Element elem, String param, String input) {
+		getAttributes(elem, param);
+		return StringUtils.leftPad(input, length, '0');
 	}
 
 	@Override

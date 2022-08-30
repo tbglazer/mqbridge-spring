@@ -3,6 +3,8 @@ package il.co.fibi.comm.mqbridge.rest;
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
 import il.co.fibi.comm.mqbridge.cache.Cache;
 import il.co.fibi.comm.mqbridge.cache.CacheType;
@@ -10,6 +12,8 @@ import il.co.fibi.comm.mqbridge.cache.ICache;
 import il.co.fibi.comm.mqbridge.data.MainframeConvertor;
 import il.co.fibi.comm.mqbridge.service.ServiceRequest;
 
+@Component
+@RequestScope
 public class MqbridgeRequest {
 	@Autowired MainframeConvertor convertor;
 	@Autowired @Cache(CacheType.CBXML) ICache cbxml;
@@ -50,7 +54,7 @@ public class MqbridgeRequest {
 	}
 	
 	public ServiceRequest toServiceRequest() {
-		String data = body != null ? convertor.xml2data(xmlFromJsonBody(trxid, body), (String)cbxml.get(trxid)) : null;
+		String data = (body != null ? convertor.xml2data(xmlFromJsonBody(trxid, body), cbxml.getValue(trxid)) : null);
 		return new ServiceRequest(trxid, data, key);
 	}
 

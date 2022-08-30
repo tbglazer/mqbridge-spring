@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.opentracing.util.GlobalTracer;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("mqbridge/v1")
 public class MqbridgeController {
 	private static Logger logger = Logger.getLogger(MqbridgeController.class.getName());
 	@Autowired

@@ -4,6 +4,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Document;
 
@@ -14,6 +15,7 @@ import net.sf.cb2xml.convert.MainframeToXml;
 import net.sf.cb2xml.convert.XmlToMainframe;
 import net.sf.cb2xml.util.XmlUtils;
 
+@Component
 @RequestScope
 public class MainframeConvertor {
 	@Autowired
@@ -31,6 +33,8 @@ public class MainframeConvertor {
 			}
 			span.setTag(ElasticApmTags.RESULT, "success");
 		} catch (Exception e) {
+			System.err.println(e);
+			e.printStackTrace();
 			span.setTag(ElasticApmTags.RESULT, "failure");
 		} finally {
 			span.finish();

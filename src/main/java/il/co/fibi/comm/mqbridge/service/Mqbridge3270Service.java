@@ -23,11 +23,16 @@ import il.co.fibi.comm.mqbridge.headers.MQCIH;
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
 
+@Component
 @RequestScope
-@Component("3270")
 public class Mqbridge3270Service extends AbstractMqbridgeService {
 	private final Logger log = Logger.getLogger(Mqbridge3270Service.class.getName());
 
+	@Override
+	public String getId() {
+		return "3270";
+	}
+	
 	@Override
 	public Logger getLogger() {
 		return log;

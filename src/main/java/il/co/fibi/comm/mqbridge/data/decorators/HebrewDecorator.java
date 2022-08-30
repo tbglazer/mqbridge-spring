@@ -15,13 +15,18 @@ import com.ibm.icu.text.BidiTransform;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 import net.sf.cb2xml.def.Cb2xmlConstants.Justified;
 
+@Component
 @RequestScope
-@Component("HEB")
 public class HebrewDecorator implements IDecorator {
 	private int length;
 	private Justified justified;
 	private String charset;
 
+	@Override
+	public String getId() {
+		return "HEB";
+	}
+	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);

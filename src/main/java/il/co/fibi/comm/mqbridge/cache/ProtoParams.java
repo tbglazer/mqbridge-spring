@@ -10,8 +10,6 @@ import org.springframework.web.context.annotation.RequestScope;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import il.co.fibi.comm.mqbridge.mongo.ProtolItem;
-
 @Component
 @RequestScope
 public class ProtoParams {
@@ -20,14 +18,17 @@ public class ProtoParams {
 	ICache proto;
 
 	@XmlEnum
-	public enum PROTOCOL {
+	public enum ProtocolType {
 		@XmlEnumValue("3270")
-		L3270, @XmlEnumValue("DPL")
-		DPL, @XmlEnumValue("CONT")
+		L3270, 
+		@XmlEnumValue("DPL")
+		DPL, 
+		@XmlEnumValue("CONT")
 		CONT
 	};
 
-	private PROTOCOL protocol; // the protocol
+	private ProtocolType
+	protocol; // the protocol
 	private String cicsid; // the cics id
 	private int timeout; // timeout in secs
 	private String progname; // grogram name
@@ -35,7 +36,7 @@ public class ProtoParams {
 	private int carealen; // commarea length
 	private int respofst; // response offset
 
-	public PROTOCOL getProtocol() {
+	public ProtocolType getProtocol() {
 		return protocol;
 	}
 
@@ -64,14 +65,14 @@ public class ProtoParams {
 	}
 
 	public ProtoParams build(String trxid) {
-		ProtolItem item = (ProtolItem) proto.get(trxid);
-		if (item != null) {
+		String val = proto.getValue(trxid);
+		if (val != null) {
 			JsonNode o = null;
 			try {
-				o = new ObjectMapper().readTree(item.getVal());
+				o = new ObjectMapper().readTree(val);
 			} catch (Exception e) {
 			}
-			protocol = PROTOCOL.valueOf(o.get("protocol").asText());
+			protocol = ProtocolType.valueOf(o.get("protocol").asText());
 			cicsid = o.get("cicsid") != null ? o.get("cicsid").asText() : "";
 			timeout = o.get("timeout") != null ? o.get("timeout").asInt() : 10;
 			progname = o.get("progname") != null ? o.get("progname").asText() : "";
@@ -79,7 +80,7 @@ public class ProtoParams {
 			carealen = o.get("carealen") != null ? o.get("carealen").asInt() : -1;
 			respofst = o.get("respofst") != null ? o.get("respofst").asInt() : -1;
 		} else {
-			protocol = PROTOCOL.L3270;
+			protocol = ProtocolType.L3270;
 			cicsid = "";
 			timeout = 10;
 			progname = "";

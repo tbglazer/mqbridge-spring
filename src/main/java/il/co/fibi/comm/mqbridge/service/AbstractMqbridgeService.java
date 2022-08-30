@@ -2,8 +2,6 @@ package il.co.fibi.comm.mqbridge.service;
 
 import java.util.logging.Logger;
 
-import javax.jms.Queue;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -33,17 +31,22 @@ public abstract class AbstractMqbridgeService {
 	protected String replyQueue;
 	protected int timeout;
 	protected int priority;
-	
+
 	public AbstractMqbridgeService init(ProtoParams params) {
 		setTimeout(params.getTimeout() * 1000);
 		return this;
 	}
+
+	public String getId() {
+		return null;
+	}
+
 	public abstract ServiceResponse send(ServiceRequest request);
 
 	public abstract ServiceResponse receive(ServiceRequest request);
 
 	public abstract Logger getLogger();
-	
+
 	public void setRequestQueue(String requestQueue) {
 		this.requestQueue = requestQueue;
 	}

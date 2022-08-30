@@ -15,8 +15,8 @@ import com.ibm.icu.text.SimpleDateFormat;
 
 import net.sf.cb2xml.def.Cb2xmlConstants;
 
+@Component
 @RequestScope
-@Component("TIM")
 public class TimeDecorator implements IDecorator {
 	private int length;
 
@@ -56,6 +56,11 @@ public class TimeDecorator implements IDecorator {
 
 	private List<TimeParam> params;
 
+	@Override
+	public String getId() {
+		return "TIM";
+	}
+	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);

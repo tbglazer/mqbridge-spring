@@ -6,10 +6,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 import org.w3c.dom.Element;
 
+@Component
 @RequestScope
-@Component("BIN")
 public class BinaryDecorator implements IDecorator {
-
+	@Override
+	public String getId() {
+		return "BIN";
+	}
+	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		return Hex.encodeHexString(input.getBytes(LATIN1));

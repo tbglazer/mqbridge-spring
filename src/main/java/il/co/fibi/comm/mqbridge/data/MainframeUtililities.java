@@ -19,7 +19,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
 import il.co.fibi.comm.mqbridge.data.decorators.BinaryDecorator;
@@ -41,19 +40,21 @@ public class MainframeUtililities {
 				.filter(Predicate.not(String::isEmpty)).map(s -> {
 					String[] param = s.split(":");
 					return new AbstractMap.SimpleEntry<IDecorator, String>(decorators.stream()
-							.filter(decor -> decor.getClass().getAnnotation(Component.class).value() == param[0].trim())
-							.findFirst().get(), param.length > 1 ? param[1] : null);
+							.filter(decor -> param[0].trim().equalsIgnoreCase(decor.getId())).findFirst().get(),
+							param.length > 1 ? param[1] : null);
 				}).collect(Collectors.toList());
 		// set default decorator if none specified
 		if (result.isEmpty()) {
 			if (Boolean.valueOf(element.getAttribute(Cb2xmlConstants.NUMERIC))) {
-				result.add(0, new AbstractMap.SimpleEntry<IDecorator, String>(decorators.stream()
-						.filter(decor -> decor.getClass().getAnnotation(Component.class).value() == NUMERIC_DECORATOR)
-						.findFirst().get(), ""));
+				result.add(0,
+						new AbstractMap.SimpleEntry<IDecorator, String>(decorators.stream()
+								.filter(decor -> NUMERIC_DECORATOR.equalsIgnoreCase(decor.getId())).findFirst().get(),
+								""));
 			} else {
-				result.add(0, new AbstractMap.SimpleEntry<IDecorator, String>(decorators.stream()
-						.filter(decor -> decor.getClass().getAnnotation(Component.class).value() == ENGLISH_DECORATOR)
-						.findFirst().get(), ""));
+				result.add(0,
+						new AbstractMap.SimpleEntry<IDecorator, String>(decorators.stream()
+								.filter(decor -> ENGLISH_DECORATOR.equalsIgnoreCase(decor.getId())).findFirst().get(),
+								""));
 			}
 		}
 		// add charset only if not binary or already has charset
@@ -61,11 +62,8 @@ public class MainframeUtililities {
 				.filter(elem -> elem.getKey() instanceof BinaryDecorator || elem.getKey() instanceof CharsetDecorator)
 				.findAny().isEmpty()) {
 			result.add(0,
-					new AbstractMap.SimpleEntry<IDecorator, String>(
-							decorators.stream()
-									.filter(decor -> decor.getClass().getAnnotation(Component.class)
-											.value() == CHARSET_DECORATOR)
-									.findFirst().get(),
+					new AbstractMap.SimpleEntry<IDecorator, String>(decorators.stream()
+							.filter(decor -> CHARSET_DECORATOR.equalsIgnoreCase(decor.getId())).findFirst().get(),
 							CharsetDecorator.DEFAULT));
 		}
 		Optional<Entry<IDecorator, String>> charset = result.stream()

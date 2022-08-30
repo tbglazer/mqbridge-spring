@@ -9,14 +9,19 @@ import org.w3c.dom.Element;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 import net.sf.cb2xml.def.Cb2xmlConstants.Justified;
 
+@Component
 @RequestScope
-@Component("ENG")
 public class EnglishDecorator implements IDecorator {
 	private int length;
 	@SuppressWarnings("unused")
 	private Justified justified;
 	private boolean blankWhenZero;
 
+	@Override
+	public String getId() {
+		return "ENG";
+	}
+	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);

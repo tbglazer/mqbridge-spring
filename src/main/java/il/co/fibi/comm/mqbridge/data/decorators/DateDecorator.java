@@ -15,8 +15,8 @@ import com.ibm.icu.text.SimpleDateFormat;
 
 import net.sf.cb2xml.def.Cb2xmlConstants;
 
+@Component
 @RequestScope
-@Component("DAT")
 public class DateDecorator implements IDecorator {
 	private int length;
 
@@ -56,6 +56,11 @@ public class DateDecorator implements IDecorator {
 
 	private List<DateParam> params;
 
+	@Override
+	public String getId() {
+		return "DAT";
+	}
+	
 	@Override
 	public String removeDecoration(Element elem, String param, String input) {
 		getAttributes(elem, param);
