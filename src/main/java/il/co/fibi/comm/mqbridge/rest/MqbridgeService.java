@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
-import il.co.fibi.comm.mqbridge.service.MqbridgeServiceFactory;
+import il.co.fibi.comm.mqbridge.services.MqbridgeServiceFactory;
 
 @RestController
 public class MqbridgeService {

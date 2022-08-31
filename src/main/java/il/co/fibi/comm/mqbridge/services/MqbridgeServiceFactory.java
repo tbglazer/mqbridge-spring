@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.service;
+package il.co.fibi.comm.mqbridge.services;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
 import il.co.fibi.comm.mqbridge.cache.ProtoParams.ProtocolType;
-import il.co.fibi.comm.mqbridge.jms.JmsConfiguration;
+import il.co.fibi.comm.mqbridge.configuration.JmsConfiguration;
 
 @Component
 public class MqbridgeServiceFactory {

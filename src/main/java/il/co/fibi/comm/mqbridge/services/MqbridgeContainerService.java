@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.service;
+package il.co.fibi.comm.mqbridge.services;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;

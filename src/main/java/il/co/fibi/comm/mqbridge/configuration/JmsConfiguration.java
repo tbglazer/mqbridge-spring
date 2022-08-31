@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.jms;
+package il.co.fibi.comm.mqbridge.configuration;
 
 import javax.annotation.PostConstruct;
 

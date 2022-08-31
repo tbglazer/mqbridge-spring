@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.service;
+package il.co.fibi.comm.mqbridge.services;
 
 public class ServiceResponse {
 	private String data;    // response data

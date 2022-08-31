@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.service;
+package il.co.fibi.comm.mqbridge.services;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicReference;

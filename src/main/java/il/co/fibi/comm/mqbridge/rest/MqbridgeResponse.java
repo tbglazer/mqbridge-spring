@@ -14,7 +14,7 @@ import il.co.fibi.comm.mqbridge.cache.Cache;
 import il.co.fibi.comm.mqbridge.cache.CacheType;
 import il.co.fibi.comm.mqbridge.cache.ICache;
 import il.co.fibi.comm.mqbridge.data.MainframeConvertor;
-import il.co.fibi.comm.mqbridge.service.ServiceResponse;
+import il.co.fibi.comm.mqbridge.services.ServiceResponse;
 
 @Component
 @RequestScope
