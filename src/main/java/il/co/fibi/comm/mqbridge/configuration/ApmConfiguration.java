@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import co.elastic.apm.attach.ElasticApmAttacher;
+import co.elastic.apm.opentracing.ElasticApmTracer;
+import io.opentracing.util.GlobalTracer;
 
 @Configuration
 @ConditionalOnProperty(value = "apm.enabled", havingValue = "true")
@@ -29,5 +31,6 @@ public class ApmConfiguration {
 		apmProps.put("log_level", env.getProperty("apm.log_level"));
 		apmProps.put("application_packages", env.getProperty("apm.application_packages"));
 		ElasticApmAttacher.attach(apmProps);
+		GlobalTracer.registerIfAbsent(new ElasticApmTracer());
 	}
 }

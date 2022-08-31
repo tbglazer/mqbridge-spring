@@ -7,9 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.jms.annotation.EnableJms;
 
 @SpringBootApplication
 @EnableMongoRepositories
+@EnableJms
 @EnableConfigurationProperties
 @EnableCaching
 public class MqbridgeApplication {
