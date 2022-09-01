@@ -1,7 +1,6 @@
 package il.co.fibi.comm.mqbridge.services;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
