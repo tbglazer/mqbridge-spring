@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
+import il.co.fibi.comm.mqbridge.mongo.ProtoRepository;
 import il.co.fibi.comm.mqbridge.mongo.ProtolItem;
 
 @Service
@@ -14,7 +14,7 @@ import il.co.fibi.comm.mqbridge.mongo.ProtolItem;
 public class ProtoCache implements ICache {
 	//private static Logger logger = Logger.getLogger(ProtoCache.class.getName());
 	@Autowired
-	private MongoRepository<ProtolItem, String> proto;
+	private ProtoRepository proto;
 
 	@Cacheable("Proto")
 	public String getValue(String key) {
