@@ -11,11 +11,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.opentracing.util.GlobalTracer;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 
 @RestController
 @RequestMapping("mqbridge/v1")
@@ -29,27 +35,35 @@ public class MqbridgeController {
 	private MqbridgeResponse response;
 
 	@PutMapping(value = "{trxid}", consumes = "application/json", produces = "application/json")
+	@ApiOperation(code = 200, value = "Send a transmision")
 	public ResponseEntity<String> send(
-			@PathVariable("trxid") final String trxid,
-			@RequestBody() final String body) {
+			@RequestHeader(name = "remote_user", required = true) final String user,
+			@PathVariable(name = "trxid", required = true) final String trxid, 
+			@RequestBody(required = true) final String body) {
 		logger.fine("Received PUT for transaction " + trxid + " body length " + body.length());
 		GlobalTracer.get().activeSpan().setOperationName("send");
 		return buildResponse(HttpStatus.CREATED, service.send(request.setup(trxid, body, null)));
 	}
 
 	@GetMapping(value = "{trxid}", consumes = "application/json", produces = "application/json")
+	@ApiOperation(code = 200, value = "Receive a transmision by message id")
 	public ResponseEntity<String> receive(
-			@PathVariable("trxid") final String trxid,
-			@RequestParam("key") String key) {
+			@RequestHeader(name = "remote_user", required = true) final String user,
+			@PathVariable(name = "trxid", required = true) final String trxid, 
+			@RequestParam(name = "key", required = true) String key) {
 		logger.fine("Received GET for transaction " + trxid + " with key " + key);
 		GlobalTracer.get().activeSpan().setOperationName("receive");
 		return buildResponse(HttpStatus.OK, service.receive(request.setup(trxid, null, key)));
 	}
 
 	@PostMapping(value = "{trxid}", consumes = "application/json", produces = "application/json")
+	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(value = "Send and receive a transmision")
+	@ApiResponse(code = 201, message = "The trnasmission was successful")
 	public ResponseEntity<String> sendReceive(
-			@PathVariable("trxid") final String trxid,
-			@RequestBody() final String body) {
+			@RequestHeader(name = "remote_user", required = true) final String user,
+			@PathVariable(name = "trxid", required = true) @ApiParam(name = "trxid", value = "transaction id", example = "N612", required = true) final String trxid,
+			@RequestBody(required = true) @ApiParam(example = "{\"GKSI_HdrBtt\":{\"GL_TRANS_ID\":\"N612\",\"GL_SHAA\":\"130100\",\"GL_TR_NOCHECHI\":\"26062020\",\"GL_TR_ASAKIM\":\"26062020\",\"GL_TR_MARECHET\":\"26062020\",\"SVIVA\":\"T\",\"GL_MISHMERET\":\"0\",\"GL_GIRSA\":\"3400\",\"GL_PEULA\":\"S612\",\"GL_BANK\":\"31\",\"GL_SNIF\":\"284\",\"GL_CH\":\"100633\",\"GL_MAKOR_PU\":\"UE\",\"GL_MAKOR_TAHANA\":\"8\",\"GL_BANK_MARECHET\":\"31\",\"GL_SNIF_MARECHET\":\"284\",\"GL_SNIF_PAKID\":\"284\",\"GL_ZIHUI_PAKID\":\"180025\",\"GL_SAMCHUT_PAKID\":\"5\",\"GL_SNIF_PATUACH\":\"O\",\"SAMCHUT_NIDRESHET\":\"5\",\"GL_GIRSA_BTT\":\"061501\",\"GL_NOSE_ISKI\":\"T\"}}", required = true) final String body) {
 		logger.info("Received POST for transaction " + trxid + " body length " + body.length());
 		GlobalTracer.get().activeSpan().setOperationName("sendreceive");
 		service.send(request.setup(trxid, body, null));

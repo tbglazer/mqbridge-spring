@@ -1,8 +1,5 @@
 package il.co.fibi.comm.mqbridge.cache;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -17,18 +14,7 @@ public class ProtoParams {
 	@Cache(CacheType.PROTO)
 	ICache proto;
 
-	@XmlEnum
-	public enum ProtocolType {
-		@XmlEnumValue("3270")
-		L3270, 
-		@XmlEnumValue("DPL")
-		DPL, 
-		@XmlEnumValue("CONT")
-		CONT
-	};
-
-	private ProtocolType
-	protocol; // the protocol
+	private ProtocolType protocol; // the protocol
 	private String cicsid; // the cics id
 	private int timeout; // timeout in secs
 	private String progname; // grogram name

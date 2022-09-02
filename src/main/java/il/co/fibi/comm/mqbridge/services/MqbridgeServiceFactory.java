@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
-import il.co.fibi.comm.mqbridge.cache.ProtoParams.ProtocolType;
+import il.co.fibi.comm.mqbridge.cache.ProtocolType;
 import il.co.fibi.comm.mqbridge.configuration.JmsConfiguration;
 
 @Component
