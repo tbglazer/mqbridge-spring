@@ -1,16 +1,11 @@
 package il.co.fibi.comm.mqbridge.configuration;
 
-import java.util.Collections;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 
 @Configuration
 public class SwaggerConfiguration {
@@ -18,25 +13,9 @@ public class SwaggerConfiguration {
 	private String serviceName;
 	@Value("${service_version}")
 	private String serviceVersion;
-	
-    private ApiInfo apiInfo() {
-        return new ApiInfo(serviceName,
-                "CICS Mqbridge Api",
-                serviceVersion,
-                "Terms of service",
-                ApiInfo.DEFAULT_CONTACT,
-                "Licensed to FIBI",
-                "",
-                Collections.emptyList());
-    }
 
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.OAS_30)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build();
-    }
+	@Bean
+	public OpenAPI springShopOpenAPI() {
+		return new OpenAPI().info(new Info().title(serviceName).description("Mqbridge CICS Api").version(serviceName));
+	}
 }
