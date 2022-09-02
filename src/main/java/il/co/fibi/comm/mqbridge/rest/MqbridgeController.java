@@ -58,7 +58,7 @@ public class MqbridgeController {
 	@PostMapping(value = "{trxid}", consumes = "application/json", produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Send and receive a transmision")
-	@ApiResponse(code = 201, message = "The trnasmission was successful")
+	@ApiResponse(code = 201, message = "The transmission was successful")
 	public ResponseEntity<String> sendReceive(
 			@RequestHeader(name = "remote_user", required = true) final String user,
 			@PathVariable(name = "trxid", required = true) @ApiParam(name = "trxid", value = "transaction id", example = "N612", required = true) final String trxid,
