@@ -2,6 +2,7 @@ package il.co.fibi.comm.mqbridge.configuration;
 
 import java.util.Collections;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,14 +14,18 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 public class SwaggerConfiguration {
-
+	@Value("${service_name}")
+	private String serviceName;
+	@Value("${service_version}")
+	private String serviceVersion;
+	
     private ApiInfo apiInfo() {
-        return new ApiInfo("MQBRIDGE-API",
+        return new ApiInfo(serviceName,
                 "CICS Mqbridge Api",
-                "1.0",
+                serviceVersion,
                 "Terms of service",
                 ApiInfo.DEFAULT_CONTACT,
-                "licensed to FIBI",
+                "Licensed to FIBI",
                 "",
                 Collections.emptyList());
     }
