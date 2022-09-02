@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.configuration;
+package il.co.fibi.comm.mqbridge.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import io.opentracing.util.GlobalTracer;
 
 @Configuration
 @ConditionalOnProperty(value = "apm.enabled", havingValue = "true")
-public class ApmConfiguration {
+public class ApmConfig {
 	@Autowired
 	private Environment env;
 

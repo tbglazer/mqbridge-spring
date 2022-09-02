@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.configuration;
+package il.co.fibi.comm.mqbridge.config;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +14,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Ticker;
 
 @Configuration
-public class CacheConfiguration {
+public class CacheConfig {
 @Value("${cache.cbxml.size}")
 private int cbxmlSize;
 @Value("${cache.cbxml.ttl}")

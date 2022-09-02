@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
 import il.co.fibi.comm.mqbridge.cache.ProtocolType;
-import il.co.fibi.comm.mqbridge.configuration.JmsConfiguration;
+import il.co.fibi.comm.mqbridge.config.JmsConfig;
 
 @Component
 public class MqbridgeServiceFactory {
 	@Autowired
-	JmsConfiguration config;
+	JmsConfig config;
 	@Autowired
 	List<AbstractMqbridgeService> services;
 

@@ -1,4 +1,4 @@
-package il.co.fibi.comm.mqbridge.configuration;
+package il.co.fibi.comm.mqbridge.config;
 
 import javax.annotation.PostConstruct;
 
@@ -7,7 +7,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JmsConfiguration {
+public class JmsConfig {
 
 	@Autowired
 	private Environment env;
