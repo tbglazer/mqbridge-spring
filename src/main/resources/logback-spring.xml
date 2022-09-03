@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+	<include resource="co/elastic/logging/logback/boot/ecs-console-appender.xml" />
+	<springProfile name="LOCAL">
+		<root level="INFO">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+	<springProfile name="T|Q|P">
+		<root level="INFO">
+			<appender-ref ref="ECS_JSON_CONSOLE" />
+		</root>
+	</springProfile>
+</configuration>

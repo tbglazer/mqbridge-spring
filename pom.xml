@@ -75,6 +75,10 @@
 			<artifactId>caffeine</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.resource</groupId>
 			<artifactId>javax.resource-api</artifactId>
 			<version>${javax-resource-api.version}</version>
@@ -134,12 +138,8 @@
 		</dependency>
 		<dependency>
 			<groupId>co.elastic.logging</groupId>
-			<artifactId>jul-ecs-formatter</artifactId>
+			<artifactId>logback-ecs-encoder</artifactId>
 			<version>${ecs-logging-java.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
