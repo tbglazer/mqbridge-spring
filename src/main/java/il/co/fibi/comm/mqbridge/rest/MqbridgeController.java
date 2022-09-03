@@ -21,7 +21,7 @@ import io.opentracing.util.GlobalTracer;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
-@RequestMapping("/mqbridge-api/v1")
+@RequestMapping("/v1")
 public class MqbridgeController {
 	private static Logger logger = Logger.getLogger(MqbridgeController.class.getName());
 	@Autowired

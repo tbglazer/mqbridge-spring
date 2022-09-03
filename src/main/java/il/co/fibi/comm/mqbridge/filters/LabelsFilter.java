@@ -13,9 +13,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.MDC;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
-public class LogDataFilter implements Filter {
-	private Pattern logHeaderPattern = Pattern.compile("Snifit-Header | FIBI-log-.*-header");
+@Component
+@Order(1)
+public class LabelsFilter implements Filter {
+	private Pattern logHeaderPattern = Pattern.compile("snifit-header|fibi-\\w+-labels");
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -24,9 +28,9 @@ public class LogDataFilter implements Filter {
 			final Enumeration<String> headerNames = ((HttpServletRequest) request).getHeaderNames();
 			while (headerNames.hasMoreElements()) {
 				String headerName = headerNames.nextElement();
-				if (logHeaderPattern.matcher(headerName).matches()) {
+				if (logHeaderPattern.matcher(headerName.toLowerCase()).matches()) {
 					String header = ((HttpServletRequest) request).getHeader(headerName);
-					Stream.of(header.split(";")).forEach(elem -> MDC.put(elem.split("=")[0], elem.split("=")[1]));
+					Stream.of(header.split(";")).forEach(elem -> MDC.put("labels.".concat(elem.split("=")[0]), elem.split("=")[1]));
 				}
 			}
 			try {
