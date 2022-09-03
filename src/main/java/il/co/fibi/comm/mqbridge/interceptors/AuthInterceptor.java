@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import il.co.fibi.comm.mqbridge.MqbridgeApplication;
+import io.opentracing.util.GlobalTracer;
 
 @Component("AuthInterceptor")
 public class AuthInterceptor implements HandlerInterceptor {
@@ -22,6 +23,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if (user != null) {
 			String[] s = user.split("@");
 			MDC.put("user.id", s[0]);
+			GlobalTracer.get().activeSpan().setTag("user.id", s[0]);
 			if (s.length > 1) MDC.put("user.domain", s[1]);
 			logger.fine("User " + user + " requested url " + request.getRequestURI() + " from " + request.getRemoteAddr());
 			return true;
