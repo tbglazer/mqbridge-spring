@@ -19,7 +19,7 @@ public class MqbridgeRequest {
 	@Autowired @Cache(CacheType.CBXML) ICache cbxml;
 
 	private String trxid; // transaction id
-	private String body; // request body
+	private JSONObject body; // request body
 	private String key; // message key
 
 	public String getTrxid() {
@@ -30,11 +30,11 @@ public class MqbridgeRequest {
 		this.trxid = trxid;
 	}
 
-	public String getBody() {
+	public JSONObject getBody() {
 		return body;
 	}
 
-	public void setBody(String body) {
+	public void setBody(JSONObject body) {
 		this.body = body;
 	}
 
@@ -46,7 +46,7 @@ public class MqbridgeRequest {
 		this.key = key;
 	}
 	
-	public MqbridgeRequest setup(String trxid, String body, String key) {
+	public MqbridgeRequest setup(String trxid, JSONObject body, String key) {
 		setTrxid(trxid);
 		setBody(body);
 		setKey(key);
@@ -58,12 +58,12 @@ public class MqbridgeRequest {
 		return new ServiceRequest(trxid, data, key);
 	}
 
-	private String xmlFromJsonBody(String trxid, String body) {
+	private String xmlFromJsonBody(String trxid, JSONObject body) {
 		StringBuffer sb = new StringBuffer();
 		return sb.append("<copybook><")
 		  .append(trxid)
 		  .append(">")
-		  .append(XML.toString(new JSONObject(body)))
+		  .append(XML.toString(body))
 		  .append("</")
 		  .append(trxid)
 		  .append("></copybook>")
