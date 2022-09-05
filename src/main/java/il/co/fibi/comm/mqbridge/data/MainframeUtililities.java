@@ -25,8 +25,10 @@ import il.co.fibi.comm.mqbridge.data.decorators.BinaryDecorator;
 import il.co.fibi.comm.mqbridge.data.decorators.CharsetDecorator;
 import il.co.fibi.comm.mqbridge.data.decorators.HebrewDecorator;
 import il.co.fibi.comm.mqbridge.data.decorators.IDecorator;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.cb2xml.def.Cb2xmlConstants;
 
+@Slf4j
 public class MainframeUtililities {
 	public static final String DECORATORS_ATTRIBUTE = "decorators";
 	public static final String NUMERIC_DECORATOR = "NUM";
@@ -100,7 +102,7 @@ public class MainframeUtililities {
 			transformer.transform(new DOMSource(element), new StreamResult(buffer));
 			return buffer.toString();
 		} catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException e) {
-			e.printStackTrace();
+			log.error("elementToXmlString failed", e);
 			return null;
 		}
 	}

@@ -1,7 +1,6 @@
 package il.co.fibi.comm.mqbridge.services;
 
-import java.util.logging.Logger;
-
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -78,7 +77,7 @@ public abstract class AbstractMqbridgeService {
 		case MQConstants.MQCRC_BRIDGE_ERROR: {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException("Bridge error, reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_MQ_API_ERROR: {
@@ -87,7 +86,7 @@ public abstract class AbstractMqbridgeService {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException(
 					"Api error, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_BRIDGE_TIMEOUT: {
@@ -96,7 +95,7 @@ public abstract class AbstractMqbridgeService {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException(
 					"Bridge timeout, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}",  e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_CICS_EXEC_ERROR: {
@@ -105,7 +104,7 @@ public abstract class AbstractMqbridgeService {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException(
 					"Cics exec error, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_SECURITY_ERROR: {
@@ -114,7 +113,7 @@ public abstract class AbstractMqbridgeService {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException(
 					"Security error, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_PROGRAM_NOT_AVAILABLE: {
@@ -123,7 +122,7 @@ public abstract class AbstractMqbridgeService {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException(
 					"Program not available, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}",  e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_TRANSID_NOT_AVAILABLE: {
@@ -132,24 +131,24 @@ public abstract class AbstractMqbridgeService {
 			int reason = cicsHeader.getMqcih__reason();
 			MqbridgeException e = new MqbridgeException(
 					"Transid not available, function:" + function + ",compcode:" + compcode + ",reason:" + reason);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_BRIDGE_ABEND: {
 			String abendcode = cicsHeader.getMqcih__abendcode();
 			MqbridgeException e = new MqbridgeException("Bridge abend, abendcode:" + abendcode);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		case MQConstants.MQCRC_APPLICATION_ABEND: {
 			String abendcode = cicsHeader.getMqcih__abendcode();
 			MqbridgeException e = new MqbridgeException("Application abend, abendcode:" + abendcode);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed: {}", e.getMessage());
 			throw e;
 		}
 		default: {
 			MqbridgeException e = new MqbridgeException("Unknown return code, returncode:" + returncode);
-			getLogger().severe("Mqbridge operation failed:" + e.getMessage());
+			getLogger().error("Mqbridge operation failed:", e.getMessage());
 			throw e;
 		}
 		}

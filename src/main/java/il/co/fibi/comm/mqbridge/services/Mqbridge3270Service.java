@@ -2,13 +2,13 @@ package il.co.fibi.comm.mqbridge.services;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.slf4j.Logger;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -22,17 +22,18 @@ import il.co.fibi.comm.mqbridge.headers.BRMQVECTORHEADER;
 import il.co.fibi.comm.mqbridge.headers.MQCIH;
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequestScope
+@Slf4j
 public class Mqbridge3270Service extends AbstractMqbridgeService {
-	private final Logger log = Logger.getLogger(Mqbridge3270Service.class.getName());
 
 	@Override
 	public String getId() {
 		return "3270";
 	}
-	
+
 	@Override
 	public Logger getLogger() {
 		return log;
@@ -106,7 +107,7 @@ public class Mqbridge3270Service extends AbstractMqbridgeService {
 		} catch (final JMSException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
 			final Exception le = e.getLinkedException();
-			log.severe("send failed:" + e.getMessage() + ((le != null) ? (", reason:" + le.getMessage()) : ""));
+			log.error("send failed: {}{}", e.getMessage(), ((le != null) ? (", reason:" + le.getMessage()) : ""));
 		} finally {
 			span.finish();
 		}
@@ -122,7 +123,8 @@ public class Mqbridge3270Service extends AbstractMqbridgeService {
 		try {
 			do {
 				jmsTemplate.setReceiveTimeout(timeout);
-				final Message msg = jmsTemplate.receiveSelected(replyQueue, JmsConstants.JMS_CORRELATIONID + "='" + request.getKey().split(";")[0] + "'");
+				final Message msg = jmsTemplate.receiveSelected(replyQueue,
+						JmsConstants.JMS_CORRELATIONID + "='" + request.getKey().split(";")[0] + "'");
 				if (msg instanceof BytesMessage) {
 					final BytesMessage bytesMsg = (BytesMessage) msg;
 					if (((bytesMsg.getIntProperty(JmsConstants.JMS_IBM_MSGTYPE)) == MQConstants.MQMT_REPLY)
@@ -152,7 +154,7 @@ public class Mqbridge3270Service extends AbstractMqbridgeService {
 						}
 					} else {
 						span.setTag(ElasticApmTags.RESULT, "failure");
-						log.severe("receive failed, unsupported message type received:" + msg.getClass().getName());
+						log.error("receive failed, unsupported message type received: {}", msg.getClass().getName());
 					}
 				} else if (msg == null) {
 					span.setTag(ElasticApmTags.RESULT, "failure");
@@ -163,11 +165,11 @@ public class Mqbridge3270Service extends AbstractMqbridgeService {
 			} while (response.getStatus() == -2);
 		} catch (UnsupportedEncodingException | MqbridgeException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
-			log.severe("receive failed:" + e.getMessage());
+			log.error("receive failed: {}", e.getMessage());
 		} catch (final JMSException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
 			final Exception le = e.getLinkedException();
-			log.severe("receive failed:" + e.getMessage() + ((le != null) ? (", reason:" + le.getMessage()) : ""));
+			log.error("receive failed: {}{}", e.getMessage(), ((le != null) ? (", reason:" + le.getMessage()) : ""));
 		} finally {
 			span.finish();
 		}

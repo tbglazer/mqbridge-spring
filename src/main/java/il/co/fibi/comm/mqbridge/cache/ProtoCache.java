@@ -12,7 +12,6 @@ import il.co.fibi.comm.mqbridge.mongo.ProtolItem;
 @Service
 @Cache(CacheType.PROTO)
 public class ProtoCache implements ICache {
-	//private static Logger logger = Logger.getLogger(ProtoCache.class.getName());
 	@Autowired
 	private ProtoRepository proto;
 

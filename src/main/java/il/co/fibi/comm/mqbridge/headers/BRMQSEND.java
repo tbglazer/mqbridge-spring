@@ -13,7 +13,7 @@ import com.ibm.etools.marshall.util.*;
  * @type-descriptor.aggregate-instance-td accessor="readWrite" contentSize="48" offset="0" size="48"
  * @type-descriptor.platform-compiler-info language="COBOL" defaultBigEndian="true" defaultCodepage="IBM-037" defaultExternalDecimalSign="ebcdic" defaultFloatType="ibm390Hex"
  */
-@SuppressWarnings({"rawtypes","unused","unchecked","deprecation"})
+@SuppressWarnings({"rawtypes","unused","unchecked"})
 public class BRMQSEND implements javax.resource.cci.Record, javax.resource.cci.Streamable, com.ibm.etools.marshall.RecordBytes {
 	private static final long serialVersionUID = 3810731497359171458L;
 	/**
@@ -292,7 +292,7 @@ public class BRMQSEND implements javax.resource.cci.Record, javax.resource.cci.S
 			String fieldName = (String) element.getValue();
 			Number fieldValue = wrappedGetNumber(fieldName);
 			if (fieldValue == null)
-				fieldValue = new Integer(0);
+				fieldValue = 0;
 			returnMap.put(key, fieldValue);
 		}
 

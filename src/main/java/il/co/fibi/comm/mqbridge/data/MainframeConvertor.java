@@ -11,12 +11,14 @@ import org.w3c.dom.Document;
 import co.elastic.apm.opentracing.ElasticApmTags;
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.cb2xml.convert.MainframeToXml;
 import net.sf.cb2xml.convert.XmlToMainframe;
 import net.sf.cb2xml.util.XmlUtils;
 
 @Component
 @RequestScope
+@Slf4j
 public class MainframeConvertor {
 	@Autowired
 	MainframeDecorator decorator;
@@ -33,8 +35,7 @@ public class MainframeConvertor {
 			}
 			span.setTag(ElasticApmTags.RESULT, "success");
 		} catch (Exception e) {
-			System.err.println(e);
-			e.printStackTrace();
+			log.error("xml2data failed", e);
 			span.setTag(ElasticApmTags.RESULT, "failure");
 		} finally {
 			span.finish();
@@ -53,6 +54,7 @@ public class MainframeConvertor {
 			}
 			span.setTag(ElasticApmTags.RESULT, "success");
 		} catch (Exception e) {
+			log.error("data2xml failed", e);
 			span.setTag(ElasticApmTags.RESULT, "failure");
 		} finally {
 			span.finish();

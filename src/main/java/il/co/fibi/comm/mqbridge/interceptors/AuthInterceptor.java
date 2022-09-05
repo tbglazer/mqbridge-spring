@@ -1,7 +1,5 @@
 package il.co.fibi.comm.mqbridge.interceptors;
 
-import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,25 +8,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import il.co.fibi.comm.mqbridge.MqbridgeApplication;
 import io.opentracing.util.GlobalTracer;
+import lombok.extern.slf4j.Slf4j;
 
 @Component("AuthInterceptor")
+@Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
-	private static final Logger logger = Logger.getLogger(MqbridgeApplication.class.getName());
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 		final String user = request.getHeader("remote_user");
 		if (user != null) {
 			String[] s = user.split("@");
 			MDC.put("user.id", s[0]);
 			GlobalTracer.get().activeSpan().setTag("user.id", s[0]);
-			if (s.length > 1) MDC.put("user.domain", s[1]);
-			logger.fine("User " + user + " requested url " + request.getRequestURI() + " from " + request.getRemoteAddr());
+			if (s.length > 1)
+				MDC.put("user.domain", s[1]);
+			log.debug("User {} requested url {} from {}", user, request.getRequestURI(), request.getRemoteAddr());
 			return true;
 		}
-		logger.warning("Access to url " + request.getRequestURI() + " from " + request.getRemoteAddr() + " not allowed");
+		log.warn("Access to url {} from {} forbidded", request.getRequestURI(), request.getRemoteAddr());
 		response.sendError(HttpStatus.FORBIDDEN.value());
 		return false;
 	}

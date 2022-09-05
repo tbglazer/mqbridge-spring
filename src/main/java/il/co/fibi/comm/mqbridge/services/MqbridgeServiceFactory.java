@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import il.co.fibi.comm.mqbridge.cache.ProtoParams;
 import il.co.fibi.comm.mqbridge.cache.ProtocolType;
 import il.co.fibi.comm.mqbridge.config.JmsConfig;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class MqbridgeServiceFactory {
 	@Autowired
 	JmsConfig config;
@@ -29,7 +31,7 @@ public class MqbridgeServiceFactory {
 				return srv;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("select failed", e);
 		}
 		return null;
 	}

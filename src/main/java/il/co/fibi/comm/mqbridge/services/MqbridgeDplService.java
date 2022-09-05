@@ -2,13 +2,13 @@ package il.co.fibi.comm.mqbridge.services;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.slf4j.Logger;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -22,11 +22,12 @@ import il.co.fibi.comm.mqbridge.constants.ibm.MQConstants;
 import il.co.fibi.comm.mqbridge.headers.MQCIH;
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequestScope
+@Slf4j
 public class MqbridgeDplService extends AbstractMqbridgeService {
-	private final Logger log = Logger.getLogger(MqbridgeDplService.class.getName());
 	private String progname;
 	private String runasid;
 	private int carealen;
@@ -115,6 +116,7 @@ public class MqbridgeDplService extends AbstractMqbridgeService {
 						msg.set(bytesMsg);
 						return bytesMsg;
 					} catch (Exception e) {
+						log.error("send failed", e);
 						throw new JMSException(e.getMessage());
 					}
 				}
@@ -125,7 +127,7 @@ public class MqbridgeDplService extends AbstractMqbridgeService {
 		} catch (JMSException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
 			Exception le = e.getLinkedException();
-			log.severe("send failed:" + e.getMessage() + ((le != null) ? (", reason:" + le.getMessage()) : ""));
+			log.error("send failed: {}{}", e.getMessage(), ((le != null) ? (", reason:" + le.getMessage()) : ""));
 		} finally {
 			span.finish();
 		}
@@ -161,7 +163,7 @@ public class MqbridgeDplService extends AbstractMqbridgeService {
 						break;
 					} else {
 						span.setTag(ElasticApmTags.RESULT, "failure");
-						log.severe("receive failed, unsupported message type received:" + msg.getClass().getName());
+						log.error("receive failed, unsupported message type received: {}", msg.getClass().getName());
 					}
 				} else if (msg == null) {
 					span.setTag(ElasticApmTags.RESULT, "failure");
@@ -171,11 +173,11 @@ public class MqbridgeDplService extends AbstractMqbridgeService {
 			} while (response.getStatus() == -2);
 		} catch (UnsupportedEncodingException | MqbridgeException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
-			log.severe("receive failed:" + e.getMessage());
+			log.error("receive failed: {}", e.getMessage());
 		} catch (JMSException e) {
 			span.setTag(ElasticApmTags.RESULT, "failure");
 			Exception le = e.getLinkedException();
-			log.severe("receive failed:" + e.getMessage() + ((le != null) ? (", reason:" + le.getMessage()) : ""));
+			log.error("receive failed: {}{}", e.getMessage(), ((le != null) ? (", reason:" + le.getMessage()) : ""));
 		} finally {
 			span.finish();
 		}

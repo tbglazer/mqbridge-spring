@@ -24,6 +24,7 @@
 		<elastic-apm.version>1.33.0</elastic-apm.version>
 		<ecs-logging-java.version>1.4.0</ecs-logging-java.version>
 		<mongodb.version>3.12.11</mongodb.version>
+		<springdoc-openapi-ui.version>1.6.11</springdoc-openapi-ui.version>
 	</properties>
 
 	<repositories>
@@ -47,15 +48,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!--dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
-		</dependency-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.6.11</version>
+			<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -120,6 +116,11 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>${org-json.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>   
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>co.elastic.apm</groupId>
